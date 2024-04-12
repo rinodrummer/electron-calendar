@@ -1,9 +1,9 @@
 {
-  "name": "electron-vue-vite",
-  "version": "28.0.0",
+  "name": "electron-calendar",
+  "version": "1.0.0",
   "main": "dist-electron/main/index.js",
-  "description": "Really simple Electron + Vue + Vite boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "Simple calendar app to reserve and manage appointments",
+  "author": "Gennaro Landolfi <code@rinodrummer.dev>",
   "license": "MIT",
   "private": true,
   "keywords": [
@@ -11,7 +11,8 @@
     "rollup",
     "vite",
     "vue3",
-    "vue"
+    "vue",
+    "fullcalendar"
   ],
   "debug": {
     "env": {
@@ -33,6 +34,15 @@
     "vite-plugin-electron": "^0.28.4",
     "vite-plugin-electron-renderer": "^0.14.5",
     "vue": "^3.4.21",
-    "vue-tsc": "^2.0.6"
+    "vue-tsc": "^2.0.6",
+    "@fullcalendar/core": "^6.1.11",
+    "@fullcalendar/daygrid": "^6.1.11",
+    "@fullcalendar/interaction": "^6.1.11",
+    "@fullcalendar/list": "^6.1.11",
+    "@fullcalendar/timegrid": "^6.1.11",
+    "@fullcalendar/vue3": "^6.1.11"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.5.0"
   }
 }
