@@ -1,4 +1,6 @@
 import { EventApi } from '@fullcalendar/core';
+import { DateTime } from 'luxon';
+
 export type CalendarView = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'list';
 
 export type DateCompatible = string | number;
@@ -25,20 +27,18 @@ export type Tables = {
     }
 };
 
-export interface Category {
 export type Table<K extends keyof Tables> = Tables[K];
-    id: number,
-    name: string,
-    color: string,
-}
 
-export interface ICalendarEvent extends EventApi {
-    date?: Date | string | number,
+export interface CalendarEvent extends BaseCalendarEvent {
+    id: number,
     description?: string,
-    categoryID?: Category['id'],
-    category?: Category,
+    start: DateTime | EventApi['start'],
+    end: DateTime | EventApi['end'],
     categoryID?: Tables['categories']['id'],
     category?: Tables['categories'],
 }
 
-export type CalendarEvent = Partial<ICalendarEvent>;
+export interface CalendarEventInput extends Partial<CalendarEvent> {
+    start?: DateTime,
+    end?: DateTime,
+}

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+    import { ref, watch } from 'vue';
     import Calendar from './components/Calendar.vue';
     import Modal from './components/Modal.vue';
     import { ref } from 'vue';
     import EventForm from './components/EventForm.vue';
-    import { CalendarEvent } from '../types.js';
+    import { CalendarEvent, CalendarEventInput, CalendarView } from '../types.js';
+    import { EventInput } from '@fullcalendar/core';
     import { DateTime } from 'luxon';
 
     const events = ref<(CalendarEvent | EventInput)[]>([]);

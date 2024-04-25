@@ -1,5 +1,5 @@
 import { type Database } from 'sqlite';
-import { CalendarEvent, ICalendarEvent } from '../../../types.js';
+import { CalendarEvent, CalendarEventInput, Table } from '../../../types.js';
 import { DateTime } from 'luxon';
 
 const dtSqlOptions = {
@@ -25,7 +25,7 @@ export function initEvents(db: Database) {
         return results;
     }
     
-    async function createEvent(event: CalendarEvent) {
+    async function createEvent(event: CalendarEventInput) {
         const stmt = await db.prepare(
             `INSERT INTO events(title, description, starts_at, ends_at, is_all_day, category_id)
                 VALUES (?, ?, ?, ?, ?, ?)`
@@ -43,7 +43,7 @@ export function initEvents(db: Database) {
         await stmt.finalize();
     }
     
-    async function updateEvent(event: ICalendarEvent) {
+    async function updateEvent(event: CalendarEvent) {
         const stmt = await db.prepare(
             `UPDATE events SET
                     title = ?,
@@ -68,7 +68,7 @@ export function initEvents(db: Database) {
         await stmt.finalize();
     }
     
-    async function deleteEvents(events: ICalendarEvent|ICalendarEvent[]) {
+    async function deleteEvents(events: CalendarEvent | CalendarEvent[]) {
         if (!Array.isArray(events)) {
             events = [ events ];
         }

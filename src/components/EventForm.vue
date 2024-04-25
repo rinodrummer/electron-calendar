@@ -1,22 +1,24 @@
 <script setup lang="ts">
     import EventTimeInput from './EventTimeInput.vue';
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
-    import { reactive, unref } from 'vue';
-    import { CalendarEvent } from '../../types.js';
-    import { formatDayString } from '@fullcalendar/core/internal.js';
+    import { onMounted, ref, unref } from 'vue';
+    import { CalendarEventInput } from '../../types.js';
 
-    const props = defineProps<{ event?: CalendarEvent }>();
-
-    const emit = defineEmits<{
-        createEvent: [ CalendarEvent ]
+    const props = defineProps<{
+        event?: CalendarEventInput,
+        notifyReset?: MessagePort,
     }>();
 
-    const form = reactive<CalendarEvent>(
-        props.event?.toPlainObject() ?? {}
+    const emit = defineEmits<{
+        createEvent: [ CalendarEventInput ]
+    }>();
+
+    const form = ref<CalendarEventInput>(
+        props.event ?? {}
     );
 
     function submitForm() {
-        const event = unref<CalendarEvent>(form);
+        const event = unref<CalendarEventInput>(form);
 
         if (event.allDay) {
             event.startStr = formatDayString(event.start);

@@ -22,7 +22,7 @@
     const emit = defineEmits<{
         showEventCreation: [],
         updateEvent: [ event: CalendarEvent ],
-        deleteEvent: [ event: number ],
+        deleteEvent: [ event: CalendarEvent ],
         viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
     }>();
 
