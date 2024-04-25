@@ -5,6 +5,7 @@ declare namespace NodeJS {
         VSCODE_DEBUG?: 'true';
         DIST_ELECTRON: string;
         DIST: string;
+        APP_ROOT: string;
         /** /dist/ or /public/ */
         VITE_PUBLIC: string;
     }

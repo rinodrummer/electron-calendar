@@ -1,7 +1,8 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { release } from 'node:os';
-import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { release } from 'node:os';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import initDatabase from './database.js';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
 globalThis.__dirname = dirname(__filename);
@@ -12,15 +13,22 @@ globalThis.__dirname = dirname(__filename);
 // │ ├─┬ main
 // │ │ └── index.js    > Electron-Main
 // │ └─┬ preload
-// │   └── index.mjs    > Preload-Scripts
+// │   └── index.mjs   > Preload-Scripts
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
-process.env.DIST_ELECTRON = join(__dirname, '..');
-process.env.DIST = join(process.env.DIST_ELECTRON, '../dist');
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-    ? join(process.env.DIST_ELECTRON, '../public')
-    : process.env.DIST;
+process.env.APP_ROOT = join(globalThis.__dirname, '../..');
+
+export const MAIN_DIST = join(process.env.APP_ROOT, 'dist-electron');
+export const RENDERER_DIST = join(process.env.APP_ROOT, 'dist');
+export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+
+process.env.DIST_ELECTRON = MAIN_DIST;
+process.env.DIST = RENDERER_DIST;
+
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+    ? join(process.env.APP_ROOT, 'public')
+    : RENDERER_DIST;
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) {
@@ -43,10 +51,8 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null;
-// Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.mjs');
-const url = process.env.VITE_DEV_SERVER_URL;
-const indexHtml = join(process.env.DIST, 'index.html');
+const indexHtml = join(RENDERER_DIST, 'index.html');
 
 async function createWindow() {
     win = new BrowserWindow({
@@ -63,8 +69,8 @@ async function createWindow() {
         },
     });
     
-    if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
-        win.loadURL(url);
+    if (VITE_DEV_SERVER_URL) { // #298
+        win.loadURL(VITE_DEV_SERVER_URL);
         // Open devTool if the app is not packaged
         win.webContents.openDevTools();
     }
@@ -72,7 +78,7 @@ async function createWindow() {
         win.loadFile(indexHtml);
     }
     
-    // Test actively push message to the Electron-Renderer
+    // Test actively push a message to the Electron-Renderer
     win.webContents.on('did-finish-load', () => {
         win?.webContents.send('main-process-message', new Date().toLocaleString());
     });
@@ -87,7 +93,17 @@ async function createWindow() {
     // win.webContents.on('will-navigate', (event, url) => { }) #344
 }
 
-app.whenReady().then(createWindow);
+initDatabase().then(({ useEvents, closeDatabase }) => {
+    app.whenReady().then(async () => {
+        useEvents();
+        
+        await createWindow();
+    });
+    
+    app.prependOnceListener('window-all-closed', async () => {
+        await closeDatabase();
+    });
+});
 
 app.on('window-all-closed', () => {
     win = null;
@@ -126,10 +142,10 @@ ipcMain.handle('open-win', (_, arg) => {
         },
     });
     
-    if (process.env.VITE_DEV_SERVER_URL) {
-        childWindow.loadURL(`${url}#${arg}`);
+    if (VITE_DEV_SERVER_URL) {
+        childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
     }
     else {
         childWindow.loadFile(indexHtml, { hash: arg })
     }
-})
+});
