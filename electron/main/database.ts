@@ -11,6 +11,12 @@ export default async function initDatabase() {
     function useEvents() {
         const eventsManager = initEvents(db);
         
+        ipcMain.on('calendar:get-all-events', async (e, data) => {
+            const events = await eventsManager.getAllEvents(data);
+            
+            e.reply('calendar:all-events', events);
+        });
+        
         ipcMain.on('calendar:create-event', async (e, data) => {
             await eventsManager.createEvent(data);
             
@@ -23,10 +29,10 @@ export default async function initDatabase() {
             e.reply('calendar:update-event');
         });
         
-        ipcMain.on('calendar:get-all-eventsManager', async (e, data) => {
-            const events = await eventsManager.getAllEvents(data);
+        ipcMain.on('calendar:delete-events', async (e, data) => {
+            await eventsManager.deleteEvents(data);
             
-            e.reply('calendar:all-eventsManager', events);
+            e.reply('calendar:delete-events');
         });
     }
     

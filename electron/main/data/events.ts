@@ -81,5 +81,6 @@ export function initEvents(db: Database) {
         getAllEvents,
         createEvent,
         updateEvent,
+        deleteEvents
     }
 }
