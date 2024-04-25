@@ -1,5 +1,12 @@
 import { type Database } from 'sqlite';
 import { CalendarEvent, ICalendarEvent } from '../../../types.js';
+import { DateTime } from 'luxon';
+
+const dtSqlOptions = {
+    includeOffset: false,
+    includeOffsetSpace: false,
+    includeZone: false
+};
 
 export function initEvents(db: Database) {
     async function getAllEvents(from: Date, to: Date = new Date()) {

@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { release } from 'node:os';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { Settings } from 'luxon';
 import initDatabase from './database.js';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,9 @@ process.env.DIST = RENDERER_DIST;
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
     ? join(process.env.APP_ROOT, 'public')
     : RENDERER_DIST;
+
+Settings.defaultLocale = 'it';
+Settings.defaultZone = 'system';
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) {
