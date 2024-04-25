@@ -9,16 +9,13 @@ const dtSqlOptions = {
 };
 
 export function initEvents(db: Database) {
-    async function getAllEvents(from: Date, to: Date = new Date()) {
+    async function getAllEvents(from: string, to: string) {
         const stmt = await db.prepare(
-            `SELECT * FROM events
-            WHERE starts_at >= ? AND events.ends_at <= ?`
+            `SELECT * FROM events`
+            //WHERE starts_at >= ? AND events.ends_at < ?
         );
         
-        const results = await stmt.all<CalendarEvent[]>(
-            from.toDateString() + ' 00:00:00',
-            to.toDateString() + ' 23:59:59',
-        );
+        const results = await stmt.all<Table<'events'>[]>();
         
         await stmt.finalize();
         
@@ -34,8 +31,8 @@ export function initEvents(db: Database) {
         await stmt.run(
             event.title,
             event.description,
-            event.start,
-            event.end,
+            event.start.startOf('minute').toSQL(dtSqlOptions),
+            event.end.endOf('minute').toSQL(dtSqlOptions),
             event.allDay,
             event.categoryID
         );
@@ -55,11 +52,14 @@ export function initEvents(db: Database) {
                 WHERE id = ?`
         );
         
+        const start = event.start instanceof DateTime ? event.start : DateTime.fromJSDate(event.start);
+        const end = event.end instanceof DateTime ? event.end : DateTime.fromJSDate(event.end);
+        
         await stmt.run(
             event.title,
             event.description,
-            event.start,
-            event.end,
+            start.startOf('minute').toSQL(dtSqlOptions),
+            end.startOf('minute').toSQL(dtSqlOptions),
             event.allDay,
             event.categoryID,
             event.id

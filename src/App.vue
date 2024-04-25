@@ -14,12 +14,20 @@
 
     const showCreation = ref<boolean>(false);
 
-    function addEvent(event: CalendarEvent) {
     const notifyEventCreation = new MessageChannel();
 
+    async function refreshAllEvents() {
+        if (!from.value || !to.value) {
+            return;
+        }
+
+        events.value = await window.ipcRenderer.invoke('calendar:get-all-events', {
+            from: from.value.startOf('day').toSQL(window.dt.sqlOptions),
+            to: to.value.endOf('day').toSQL(window.dt.sqlOptions)
+        });
     }
 
-    async function addEvent(event: CalendarEventData) {
+    async function addEvent(event: CalendarEventInput) {
         await window.ipcRenderer.invoke('calendar:create-event', event);
 
         showCreation.value = false;
