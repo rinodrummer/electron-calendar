@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { ref, watchEffect } from 'vue';
+    import { DateTime } from 'luxon';
 
     interface Props {
         hideTime?: boolean,
@@ -9,7 +10,7 @@
         hideTime: false,
     });
 
-    const model = defineModel<Date | string | number | null>();
+    const model = defineModel<DateTime | null>();
 
     const slots = defineSlots<{
         date: [],
@@ -20,7 +21,7 @@
     const time = ref<string | null>();
 
     watchEffect(() => {
-        const dt = new Date(date.value);
+        const dt = DateTime.fromISO(date.value);
 
         let hours = '0';
         let minutes = '0';
@@ -29,10 +30,8 @@
             [ hours, minutes ] = time.value.split(':');
         }
 
-        dt.setHours(Number(hours));
-        dt.setMinutes(Number(minutes));
-        dt.setSeconds(0);
-        dt.setMilliseconds(0);
+        dt.set({ hour: Number(hours), minute: Number(minutes) })
+            .startOf('minute');
 
         model.value = dt;
     });
