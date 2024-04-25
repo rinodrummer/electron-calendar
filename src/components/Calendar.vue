@@ -5,6 +5,7 @@
     import timeGridPlugin from '@fullcalendar/timegrid';
     import listPlugin from '@fullcalendar/list';
     import interactionPlugin from '@fullcalendar/interaction';
+    import luxonPlugin from '@fullcalendar/luxon3';
     import itLocale from '@fullcalendar/core/locales/it';
     import { CalendarEvent } from '../../types.js';
 
@@ -24,6 +25,7 @@
 
     const options: CalendarOptions = {
         plugins: [
+            luxonPlugin,
             dayGridPlugin,
             timeGridPlugin,
             listPlugin,
@@ -41,7 +43,7 @@
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'addEvent today dayGridMonth,timeGridWeek,timeGridDay,list' // user can switch between the two
+            right: 'addEvent today dayGridMonth,timeGridWeek,timeGridDay,list',
         },
         businessHours: {
             daysOfWeek: [ 1, 2, 3, 4, 5 ],
@@ -61,6 +63,8 @@
             meridiem: false,
         },
         initialView: 'timeGridWeek',
+        slotLabelFormat: 'T',
+        eventTimeFormat: 'T',
         nowIndicator: true,
         locale: itLocale,
         events: props.events,
