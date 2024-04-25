@@ -50,7 +50,8 @@
 </template>
 
 <style scoped>
-    .modal {
+    .modal[open],
+    .modal.open {
         min-width: 320px;
         max-width: 90vw;
         max-height: 90dvh;
