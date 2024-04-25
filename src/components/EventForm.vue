@@ -30,6 +30,16 @@
 
         emit('createEvent', event);
     }
+
+    onMounted(() => {
+        props.notifyReset.onmessage = (e) => {
+            console.log(e);
+
+            if (e.data === 'reset') {
+                form.value = {};
+            }
+        };
+    });
 </script>
 
 <template>

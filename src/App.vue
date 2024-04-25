@@ -2,7 +2,6 @@
     import { ref, watch } from 'vue';
     import Calendar from './components/Calendar.vue';
     import Modal from './components/Modal.vue';
-    import { ref } from 'vue';
     import EventForm from './components/EventForm.vue';
     import { CalendarEvent, CalendarEventInput, CalendarView } from '../types.js';
     import { EventInput } from '@fullcalendar/core';
@@ -16,6 +15,7 @@
     const showCreation = ref<boolean>(false);
 
     function addEvent(event: CalendarEvent) {
+    const notifyEventCreation = new MessageChannel();
 
     }
 
@@ -37,6 +37,8 @@
 </script>
 
 <template>
+    <button @click="notifyEventCreation.port1.postMessage('reset')">Clear</button>
+
     <Calendar
         :events
         view="timeGridWeek"
@@ -60,6 +62,7 @@
 
         <EventForm
             id="create-event-form"
+            :notify-reset="notifyEventCreation.port2"
             @create-event="addEvent"
         />
 
