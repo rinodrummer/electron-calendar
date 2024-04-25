@@ -23,12 +23,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
-    "preview": "vite preview"
     "preview": "vite preview",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.12",
     "@types/sqlite3": "^3.1.11",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.19",
