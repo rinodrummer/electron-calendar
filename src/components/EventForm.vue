@@ -20,13 +20,13 @@
     function submitForm() {
         const event = unref<CalendarEventInput>(form);
 
-        if (event.allDay) {
-            event.startStr = formatDayString(event.start);
+        /*if (event.allDay) {
+            event.startStr = event.start;
             event.endStr = formatDayString(event.end);
 
             delete event.start;
             delete event.end;
-        }
+        }*/
 
         emit('createEvent', event);
     }
