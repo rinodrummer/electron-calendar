@@ -4,20 +4,21 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "rd-calendar",
-  "asar": true,
+  "asar": false,
   "productName": "Calendario Appuntamenti",
   "directories": {
     "output": "release/${version}"
   },
   "files": [
     "dist",
-    "dist-electron"
+    "dist-electron",
+    "migrations"
   ],
-  "mac": {
-    "target": [
-      "dmg"
-    ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
   },
   "win": {
     "target": [
@@ -30,16 +31,12 @@
     ],
     "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
   },
-  "nsis": {
-    "oneClick": false,
-    "perMachine": false,
-    "allowToChangeInstallationDirectory": true,
-    "deleteAppDataOnUninstall": false
+  "mac": {
+    "target": ["dmg"],
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
   },
   "linux": {
-    "target": [
-      "AppImage"
-    ],
+    "target": ["AppImage"],
     "artifactName": "${productName}-Linux-${version}.${ext}"
   }
 }

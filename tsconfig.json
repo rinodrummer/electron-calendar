@@ -1,19 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es2022",
+    "module": "esnext",
     "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": ["esnext", "DOM"],
     "skipLibCheck": true,
-    "noEmit": true
+    "strictNullChecks": false,
+    "noEmit": true,
+    "allowJs": true,
+    "baseUrl": "."
   },
-  "include": ["src"],
+  "include": ["src", "types.ts"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

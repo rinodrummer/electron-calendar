@@ -41,6 +41,9 @@ export default defineConfig(({ command }) => {
                                 // Of course, this is not absolute, just this way is relatively simple. :)
                                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
                             },
+                            commonjsOptions: {
+                                ignoreDynamicRequires: true,
+                            },
                         },
                     },
                 },
@@ -73,5 +76,10 @@ export default defineConfig(({ command }) => {
             };
         })(),
         clearScreen: false,
+        build: {
+            rollupOptions: {
+                external: [ 'sqlite3' ]
+            }
+        }
     };
 });
