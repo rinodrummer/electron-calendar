@@ -19,6 +19,10 @@ CREATE TABLE events (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX event_dates ON events(starts_at, ends_at);
+
 -- Down
+DROP INDEX event_dates;
+
 DROP TABLE events;
 DROP TABLE categories;
