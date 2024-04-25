@@ -7,10 +7,12 @@
     import interactionPlugin from '@fullcalendar/interaction';
     import luxonPlugin from '@fullcalendar/luxon3';
     import itLocale from '@fullcalendar/core/locales/it';
-    import { CalendarEvent } from '../../types.js';
+    import { DateTime } from 'luxon';
+    import { CalendarEvent, CalendarView } from '../../types.js';
 
     interface Props {
         events?: CalendarEvent[],
+        view: CalendarView
     }
 
     const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +22,8 @@
     const emit = defineEmits<{
         showEventCreation: [],
         updateEvent: [ event: CalendarEvent ],
-        deleteEvent: [ event: number ]
+        deleteEvent: [ event: number ],
+        viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
     }>();
 
     const options: CalendarOptions = {
@@ -55,7 +58,14 @@
         initialView: props.view,
         nowIndicator: true,
         locale: itLocale,
-        events: props.events,
+        events: props.events as EventInput,
+        datesSet({ start, end, view }) {
+            emit('viewChanged', {
+                start: DateTime.fromJSDate(start),
+                end: DateTime.fromJSDate(end),
+                view: view.type as CalendarView
+            });
+        },
     };
 </script>
 
