@@ -28,6 +28,7 @@ export type Tables = {
 };
 
 export type Table<K extends keyof Tables> = Tables[K];
+export type Insert<K extends keyof Tables> = Omit<Tables[K], 'id'>;
 
 export interface CalendarEvent extends BaseCalendarEvent {
     id: number,

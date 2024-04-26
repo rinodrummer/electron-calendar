@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { type CalendarOptions, EventInput } from '@fullcalendar/core';
+    import { Calendar, type CalendarOptions, EventInput } from '@fullcalendar/core';
     import FullCalendar from '@fullcalendar/vue3';
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
@@ -7,17 +7,20 @@
     import interactionPlugin from '@fullcalendar/interaction';
     import luxonPlugin from '@fullcalendar/luxon3';
     import itLocale from '@fullcalendar/core/locales/it';
+    import { reactive, ref, toRaw, watch } from 'vue';
     import { DateTime } from 'luxon';
     import { CalendarEvent, CalendarView } from '../../types.js';
 
     interface Props {
-        events?: CalendarEvent[],
+        events?: (CalendarEvent | EventInput)[],
         view: CalendarView
     }
 
     const props = withDefaults(defineProps<Props>(), {
         events: () => [],
     });
+
+    const fullCalendar = ref<{ getApi(): Calendar } | null>();
 
     const emit = defineEmits<{
         showEventCreation: [],
@@ -26,7 +29,7 @@
         viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
     }>();
 
-    const options: CalendarOptions = {
+    const options = reactive<CalendarOptions>({
         plugins: [
             luxonPlugin,
             dayGridPlugin,
@@ -66,13 +69,20 @@
                 view: view.type as CalendarView
             });
         },
-    };
+    });
+
+    watch(() => props.events, (events) => {
+        options.events = events as EventInput[];
+
+        fullCalendar.value?.getApi().refetchEvents();
+    });
 </script>
 
 <template>
-    <FullCalendar :options>
+    <FullCalendar :options ref="fullCalendar">
         <template v-slot:eventContent="arg">
-            <b>{{ arg.timeText }}</b>
+            <p>{{ arg.timeText }}</p>
+
             <i>{{ arg.event.title }}</i>
         </template>
     </FullCalendar>

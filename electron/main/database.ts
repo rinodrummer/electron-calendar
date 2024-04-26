@@ -2,11 +2,23 @@ import { ipcMain } from 'electron';
 import { Database } from 'sqlite';
 import { initEvents } from './data/events.js';
 import { getSqlite3 } from './sqlite3.js';
-import { CalendarEvent } from '../../types.js';
-import { EventInput } from '@fullcalendar/core';
-import { DateTime } from 'luxon';
 
 let db: Database = null;
+
+export function toPlaceholders(obj: object) {
+    return Object.entries(obj).reduce(
+        (acc, [ key, val ]) => {
+            if (!key.startsWith('$')) {
+                key = '$' + key;
+            }
+            
+            acc[key] = val;
+            
+            return acc;
+        },
+        {}
+    )
+}
 
 export default async function initDatabase() {
     db = await getSqlite3();
@@ -15,26 +27,10 @@ export default async function initDatabase() {
         const eventsManager = initEvents(db);
         
         ipcMain.handle('calendar:get-all-events', async (e, { from, to }) => {
-            const result = await eventsManager.getAllEvents(from, to);
-            
-            result.map<CalendarEvent | EventInput>((event) => ({
-                id: event.id,
-                title: event.title,
-                description: event.description,
-                start: DateTime.fromSQL(event.starts_at.toString()),
-                end: DateTime.fromSQL(event.starts_at.toString()),
-                allDay: event.is_all_day,
-                editable: true,
-                startEditable: true,
-                durationEditable: true,
-            }));
-            
-            return result;
+            return await eventsManager.getAllEvents(from, to);
         });
         
         ipcMain.handle('calendar:create-event', async (e, data) => {
-            console.log(data);
-            
             return await eventsManager.createEvent(data);
         });
         

@@ -1,12 +1,6 @@
 import { type Database } from 'sqlite';
-import { CalendarEvent, CalendarEventInput, Table } from '../../../types.js';
-import { DateTime } from 'luxon';
-
-const dtSqlOptions = {
-    includeOffset: false,
-    includeOffsetSpace: false,
-    includeZone: false
-};
+import { Insert, Table } from '../../../types.js';
+import { toPlaceholders } from '../database.js';
 
 export function initEvents(db: Database) {
     async function getAllEvents(from: string, to: string) {
@@ -22,53 +16,35 @@ export function initEvents(db: Database) {
         return results;
     }
     
-    async function createEvent(event: CalendarEventInput) {
+    async function createEvent(event: Insert<'events'>) {
         const stmt = await db.prepare(
             `INSERT INTO events(title, description, starts_at, ends_at, is_all_day, category_id)
-                VALUES (?, ?, ?, ?, ?, ?)`
+                VALUES ($title, $description, $starts_at, $ends_at, $is_all_day, $category_id)`
         );
         
-        await stmt.run(
-            event.title,
-            event.description,
-            event.start.startOf('minute').toSQL(dtSqlOptions),
-            event.end.endOf('minute').toSQL(dtSqlOptions),
-            event.allDay,
-            event.categoryID
-        );
+        await stmt.run(toPlaceholders(event));
         
         await stmt.finalize();
     }
     
-    async function updateEvent(event: CalendarEvent) {
+    async function updateEvent(event: Table<'events'>) {
         const stmt = await db.prepare(
             `UPDATE events SET
-                    title = ?,
-                    description = ?,
-                    starts_at = ?,
-                    ends_at = ?,
-                    is_all_day = ?,
-                    category_id = ?
-                WHERE id = ?`
+                    title = $title,
+                    description = $description,
+                    starts_at = $starts_at,
+                    ends_at = $ends_at,
+                    is_all_day = $is_all_day,
+                    category_id = $category_id
+                WHERE id = $id`
         );
         
-        const start = event.start instanceof DateTime ? event.start : DateTime.fromJSDate(event.start);
-        const end = event.end instanceof DateTime ? event.end : DateTime.fromJSDate(event.end);
-        
-        await stmt.run(
-            event.title,
-            event.description,
-            start.startOf('minute').toSQL(dtSqlOptions),
-            end.startOf('minute').toSQL(dtSqlOptions),
-            event.allDay,
-            event.categoryID,
-            event.id
-        );
+        await stmt.run(toPlaceholders(event));
         
         await stmt.finalize();
     }
     
-    async function deleteEvents(events: CalendarEvent | CalendarEvent[]) {
+    async function deleteEvents(events: Table<'events'> | Table<'events'>[]) {
         if (!Array.isArray(events)) {
             events = [ events ];
         }

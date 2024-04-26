@@ -2,7 +2,7 @@
     import EventTimeInput from './EventTimeInput.vue';
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
     import { onMounted, ref, unref } from 'vue';
-    import { CalendarEventInput } from '../../types.js';
+    import { CalendarEventInput, Insert } from '../../types.js';
 
     const props = defineProps<{
         event?: CalendarEventInput,
@@ -10,7 +10,7 @@
     }>();
 
     const emit = defineEmits<{
-        createEvent: [ CalendarEventInput ]
+        createEvent: [ Insert<'events'> ]
     }>();
 
     const form = ref<CalendarEventInput>(
@@ -18,7 +18,14 @@
     );
 
     function submitForm() {
-        const event = unref<CalendarEventInput>(form);
+        const {
+            start,
+            end,
+            category,
+            categoryID,
+            allDay,
+            ...event
+        } = unref<CalendarEventInput>(form);
 
         /*if (event.allDay) {
             event.startStr = event.start;
@@ -28,13 +35,16 @@
             delete event.end;
         }*/
 
-        emit('createEvent', event);
+        emit('createEvent', {
+            ...event as Required<Insert<'events'>>,
+            starts_at: start?.toSQL(window.dt.sqlOptions),
+            ends_at: end?.toSQL(window.dt.sqlOptions),
+            category_id: categoryID,
+        });
     }
 
     onMounted(() => {
         props.notifyReset.onmessage = (e) => {
-            console.log(e);
-
             if (e.data === 'reset') {
                 form.value = {};
             }
