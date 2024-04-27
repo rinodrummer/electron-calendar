@@ -28,8 +28,8 @@
         }
 
         const rawEvents: Table<'events'>[] = await window.ipcRenderer.invoke('calendar:get-all-events', {
-            from: from.value.startOf('day').toSQL(window.dt.sqlOptions),
-            to: to.value.endOf('day').toSQL(window.dt.sqlOptions)
+            from: from.value.startOf('day').toMillis(),
+            to: to.value.startOf('day').toMillis()
         });
 
         events.value = rawEvents.map((event) => ({

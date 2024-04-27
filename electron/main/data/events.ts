@@ -3,13 +3,16 @@ import { Insert, Table } from '../../../types.js';
 import { toPlaceholders } from '../database.js';
 
 export function initEvents(db: Database) {
-    async function getAllEvents(from: string, to: string) {
+    async function getAllEvents(from: number, to: number) {
         const stmt = await db.prepare(
-            `SELECT * FROM events`
-            //WHERE starts_at >= ? AND events.ends_at < ?
+            `SELECT * FROM events
+            WHERE starts_at >= ? AND events.ends_at < ?`
         );
         
-        const results = await stmt.all<Table<'events'>[]>();
+        const results = await stmt.all<Table<'events'>[]>(
+            from,
+            to
+        );
         
         await stmt.finalize();
         
