@@ -31,7 +31,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
     ? join(process.env.APP_ROOT, 'public')
     : RENDERER_DIST;
 
-Settings.defaultLocale = 'it';
+Settings.defaultLocale = app.getLocale();
 Settings.defaultZone = 'system';
 
 // Disable GPU Acceleration for Windows 7
