@@ -7,7 +7,7 @@
     import interactionPlugin from '@fullcalendar/interaction';
     import luxonPlugin from '@fullcalendar/luxon3';
     import itLocale from '@fullcalendar/core/locales/it';
-    import { reactive, ref, toRaw, watch } from 'vue';
+    import { reactive, ref, watch } from 'vue';
     import { DateTime } from 'luxon';
     import { CalendarEvent, CalendarView } from '../../types.js';
 
@@ -23,7 +23,7 @@
     const fullCalendar = ref<{ getApi(): Calendar } | null>();
 
     const emit = defineEmits<{
-        showEventCreation: [],
+        showEventForm: [ event?: CalendarEvent ],
         updateEvent: [ event: CalendarEvent ],
         deleteEvent: [ event: CalendarEvent ],
         viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
@@ -42,7 +42,7 @@
                 text: 'Agg. nuovo',
                 hint: 'Aggiungi un evento',
                 click() {
-                    emit('showEventCreation');
+                    emit('showEventForm');
                 },
             }
         },
@@ -67,6 +67,21 @@
                 start: DateTime.fromJSDate(start),
                 end: DateTime.fromJSDate(end),
                 view: view.type as CalendarView
+            });
+        },
+        eventDidMount(e) {
+            e.el.addEventListener('dblclick', () => {
+                const event = e.event.toPlainObject({
+                    collapseExtendedProps: true,
+                    collapseColor: true,
+                });
+
+                emit('showEventForm', {
+                    ...event,
+                    id: Number(event.id),
+                    start: DateTime.fromISO(event.start),
+                    end: DateTime.fromISO(event.end),
+                } as CalendarEvent);
             });
         },
     });

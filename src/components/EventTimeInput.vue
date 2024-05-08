@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { ref, watchEffect } from 'vue';
+    import { ref, watch } from 'vue';
     import { DateTime } from 'luxon';
 
     interface Props {
@@ -10,31 +10,35 @@
         hideTime: false,
     });
 
-    const model = defineModel<DateTime | null>();
-
-    const slots = defineSlots<{
+    defineSlots<{
         date: [],
         time: [],
     }>();
 
+    const model = defineModel<DateTime | null>();
+
     const date = ref<string | null>();
     const time = ref<string | null>();
 
-    watchEffect(() => {
-        const dt = DateTime.fromISO(date.value);
+    watch([ date, time ], ([ date, time ]) => {
+        const dt = DateTime.fromISO(date);
 
-        let hours = '0';
-        let minutes = '0';
+        if (time) {
+            const timeObj = DateTime.fromISO(time, { setZone: true });
 
-        if (time.value) {
-            [ hours, minutes ] = time.value.split(':');
+            const { hour, minute } = timeObj;
+
+            model.value = dt?.set({ hour, minute })
+                .startOf('minute');
         }
-
-        dt.set({ hour: Number(hours), minute: Number(minutes) })
-            .startOf('minute');
-
-        model.value = dt;
     });
+
+    watch(model, function (model) {
+        model = model?.setZone('UTC', { keepLocalTime: true });
+
+        date.value = model?.toISODate();
+        time.value = model?.toLocaleString(DateTime.TIME_24_SIMPLE);
+    }, { immediate: true });
 </script>
 
 <template>

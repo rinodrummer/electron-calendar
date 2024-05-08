@@ -1,8 +1,8 @@
 <script setup lang="ts">
     import EventTimeInput from './EventTimeInput.vue';
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
-    import { onMounted, ref, unref } from 'vue';
-    import { CalendarEventInput, Insert } from '../../types.js';
+    import { onMounted, ref, unref, watch } from 'vue';
+    import { CalendarEventInput, Upsert } from '../../types.js';
 
     const props = defineProps<{
         event?: CalendarEventInput,
@@ -10,7 +10,7 @@
     }>();
 
     const emit = defineEmits<{
-        createEvent: [ Insert<'events'> ]
+        saveEvent: [ Upsert<'events'> ]
     }>();
 
     const form = ref<CalendarEventInput>(
@@ -27,18 +27,11 @@
             ...event
         } = unref<CalendarEventInput>(form);
 
-        /*if (event.allDay) {
-            event.startStr = event.start;
-            event.endStr = formatDayString(event.end);
-
-            delete event.start;
-            delete event.end;
-        }*/
-
-        emit('createEvent', {
-            ...event as Required<Insert<'events'>>,
-            starts_at: start?.toSQL(window.dt.sqlOptions),
-            ends_at: end?.toSQL(window.dt.sqlOptions),
+        emit('saveEvent', {
+            ...event as Required<Upsert<'events'>>,
+            is_all_day: Number(allDay),
+            starts_at: start?.toMillis(),
+            ends_at: end?.toMillis(),
             category_id: categoryID,
         });
     }
@@ -50,6 +43,11 @@
             }
         };
     });
+
+    watch(
+        () => props.event,
+        () => form.value = { ...props.event }
+    );
 </script>
 
 <template>

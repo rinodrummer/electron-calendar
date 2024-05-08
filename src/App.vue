@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { EventInput } from '@fullcalendar/core';
     import { DateTime } from 'luxon';
-    import { ref, watch } from 'vue';
+    import { ref, unref, watch } from 'vue';
     import Calendar from './components/Calendar.vue';
     import Modal from './components/Modal.vue';
     import EventForm from './components/EventForm.vue';
@@ -9,10 +9,12 @@
 
     const events = ref<(CalendarEvent | EventInput)[]>([]);
 
+    const editingEvent = ref<CalendarEvent | EventInput | null>();
+
     const from = ref<DateTime | null>();
     const to = ref<DateTime | null>();
 
-    const showCreation = ref<boolean>(false);
+    const showEventForm = ref<boolean>(false);
 
     const notifyEventCreation = new MessageChannel();
 
@@ -46,12 +48,27 @@
     }
 
     async function addEvent(event: Insert<'events'>) {
-        await window.ipcRenderer.invoke('calendar:create-event', event);
+        try {
+            await window.ipcRenderer.invoke('calendar:create-event', event);
 
-        showCreation.value = false;
-        notifyEventCreation.port1.postMessage('reset');
+            showEventForm.value = false;
+            notifyEventCreation.port1.postMessage('reset');
 
-        await refreshAllEvents();
+            await refreshAllEvents();
+        }
+        catch (err) {}
+    }
+
+    async function updateEvent(event: Table<'events'>) {
+        try {
+            await window.ipcRenderer.invoke('calendar:update-event', event);
+
+            showEventForm.value = false;
+            notifyEventCreation.port1.postMessage('reset');
+
+            await refreshAllEvents();
+        }
+        catch (err) {}
     }
 
     function setViewDates({ start, end }: { start: DateTime, end: DateTime, view: CalendarView }) {
@@ -67,17 +84,23 @@
         :events
         view="timeGridWeek"
         @view-changed="setViewDates"
-        @show-event-creation="() => showCreation = true"
+        @show-event-form="(event) => {
+            editingEvent = event;
+            showEventForm = true;
+        }"
     />
 
-    <Modal v-model="showCreation" id="create-event-modal">
+    <Modal v-model="showEventForm" id="create-event-modal">
         <template #header>
             <div class="flex justify-between items-center gap-2">
-                <p class="text-lg font-bold">Aggiungi un nuovo evento</p>
+                <p
+                    class="text-lg font-bold"
+                    v-text="!editingEvent ? 'Aggiungi un nuovo evento' : 'Modifica l\'evento'"
+                ></p>
 
                 <button
                     type="button"
-                    @click.prevent="showCreation = false"
+                    @click.prevent="showEventForm = false"
                 >
                     &times;
                 </button>
@@ -85,14 +108,19 @@
         </template>
 
         <EventForm
-            id="create-event-form"
+            id="event-form"
+            :event="unref(editingEvent)"
             :notify-reset="notifyEventCreation.port2"
-            @create-event="addEvent"
+            @save-event="(calEvent) => calEvent.id ? updateEvent(calEvent as Table<'events'>) : addEvent(calEvent)"
         />
 
         <template #footer>
             <div class="flex justify-end">
-                <button type="submit" form="create-event-form">Aggiungi</button>
+                <button
+                    type="submit"
+                    form="event-form"
+                    v-text="!editingEvent ? 'Aggiungi' : 'Aggiorna'"
+                ></button>
             </div>
         </template>
     </Modal>
