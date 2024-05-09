@@ -16,7 +16,7 @@
 
     const showEventForm = ref<boolean>(false);
 
-    const notifyEventCreation = new MessageChannel();
+    const notifyEventForm = new MessageChannel();
 
     function getDateTime(date: DateCompatible): DateTime {
         return typeof date === 'number' ?
@@ -52,7 +52,7 @@
             await window.ipcRenderer.invoke('calendar:create-event', event);
 
             showEventForm.value = false;
-            notifyEventCreation.port1.postMessage('reset');
+            notifyEventForm.port1.postMessage('reset');
 
             await refreshAllEvents();
         }
@@ -64,7 +64,19 @@
             await window.ipcRenderer.invoke('calendar:update-event', event);
 
             showEventForm.value = false;
-            notifyEventCreation.port1.postMessage('reset');
+            notifyEventForm.port1.postMessage('reset');
+
+            await refreshAllEvents();
+        }
+        catch (err) {}
+    }
+
+    async function deleteEvent(event: CalendarEvent | EventInput) {
+        try {
+            await window.ipcRenderer.invoke('calendar:delete-events', event.id);
+
+            showEventForm.value = false;
+            notifyEventForm.port1.postMessage('reset');
 
             await refreshAllEvents();
         }
@@ -110,12 +122,22 @@
         <EventForm
             id="event-form"
             :event="unref(editingEvent)"
-            :notify-reset="notifyEventCreation.port2"
+            :notify-reset="notifyEventForm.port2"
             @save-event="(calEvent) => calEvent.id ? updateEvent(calEvent as Table<'events'>) : addEvent(calEvent)"
         />
 
         <template #footer>
-            <div class="flex justify-end">
+            <div class="flex justify-between">
+                <div>
+                    <button
+                        v-if="editingEvent"
+                        type="button"
+                        @click="deleteEvent(editingEvent)"
+                    >
+                        Elimina evento
+                    </button>
+                </div>
+
                 <button
                     type="submit"
                     form="event-form"

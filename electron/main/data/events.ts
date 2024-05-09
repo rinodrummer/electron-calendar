@@ -2,6 +2,8 @@ import { type Database } from 'sqlite';
 import { Insert, Table } from '../../../types.js';
 import { toPlaceholders } from '../database.js';
 
+type EventIdentifier = Table<'events'> | Table<'events'>['id'];
+
 export function initEvents(db: Database) {
     async function getAllEvents(from: number, to: number) {
         const stmt = await db.prepare(
@@ -47,18 +49,24 @@ export function initEvents(db: Database) {
         await stmt.finalize();
     }
     
-    async function deleteEvents(events: Table<'events'> | Table<'events'>[]) {
+    async function deleteEvents(events: EventIdentifier|EventIdentifier[]) {
         if (!Array.isArray(events)) {
             events = [ events ];
         }
+        
+        events = events.map((event) => {
+            if (typeof event === 'object') {
+                return event.id;
+            }
+            
+            return event;
+        })
         
         const stmt = await db.prepare(
             `DELETE FROM events WHERE id IN (?)`
         );
         
-        await stmt.run(
-            events.map((event) => event.id).join(', ')
-        );
+        await stmt.run(events.join(', '));
         
         await stmt.finalize();
     }
