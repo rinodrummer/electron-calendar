@@ -10,7 +10,7 @@ export function createEventContextMenu(event: CalendarEvent, eventsManager: Even
         accelerator: 'e',
         async click() {
             await eventsManager.deleteEvents(event.id);
-            win.webContents.send('event:refresh');
+            win.webContents.send('ui@events:refresh');
         }
     }));
     

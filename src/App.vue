@@ -90,7 +90,7 @@
 
     watch([ from, to ], refreshAllEvents);
 
-    window.ipcRenderer.on('event:refresh', refreshAllEvents);
+    window.ipcRenderer.on('ui@events:refresh', refreshAllEvents);
 </script>
 
 <template>
