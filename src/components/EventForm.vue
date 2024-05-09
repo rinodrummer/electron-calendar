@@ -3,6 +3,7 @@
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
     import { onMounted, ref, unref, watch } from 'vue';
     import { CalendarEventInput, Upsert } from '../../types.js';
+    import { DateTime } from 'luxon';
 
     const props = defineProps<{
         event?: CalendarEventInput,
@@ -86,12 +87,16 @@
                     <template #date>
                         <EventTimeInputAttrs
                             aria-label="Data di inizio dell'evento"
+                            :max="form.end?.toISODate()"
                         />
                     </template>
 
                     <template #time>
                         <EventTimeInputAttrs
                             aria-label="Ora di inizio dell'evento"
+                            :min="form.end?.minus({ minute: 5 })
+                                .setZone('utc', { keepLocalTime: true })
+                                .toLocaleString(DateTime.TIME_24_SIMPLE)"
                         />
                     </template>
                 </EventTimeInput>
@@ -106,12 +111,16 @@
                     <template #date>
                         <EventTimeInputAttrs
                             aria-label="Data di fine dell'evento"
+                            :min="form.start?.toISODate()"
                         />
                     </template>
 
                     <template #time>
                         <EventTimeInputAttrs
                             aria-label="Ora di fine dell'evento"
+                            :min="form.start?.plus({ minute: 5 })
+                                .setZone('utc', { keepLocalTime: true })
+                                .toLocaleString(DateTime.TIME_24_SIMPLE)"
                         />
                     </template>
                 </EventTimeInput>
