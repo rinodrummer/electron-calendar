@@ -71,12 +71,12 @@
             });
         },
         eventDidMount(eventMount) {
-            eventMount.el.addEventListener('dblclick', () => {
-                const event = eventMount.event.toPlainObject({
-                    collapseExtendedProps: true,
-                    collapseColor: true,
-                });
+            const event = eventMount.event.toPlainObject({
+                collapseExtendedProps: true,
+                collapseColor: true,
+            });
 
+            eventMount.el.addEventListener('dblclick', () => {
                 emit('showEventForm', {
                     ...event,
                     id: Number(event.id),
@@ -86,15 +86,12 @@
             }, false);
 
             eventMount.el.addEventListener('contextmenu', async (e) => {
-                const event = eventMount.event.toPlainObject({
-                    collapseExtendedProps: true,
-                    collapseColor: true,
-                });
-
-                console.log('ctx opening');
-
                 window.ipcRenderer.send('event:show-ctx-menu', {
-                    event,
+                    event: {
+                        ...event,
+                        start: DateTime.fromISO(event.start),
+                        end: DateTime.fromISO(event.end),
+                    },
                     position: {
                         x: e.x,
                         y: e.y,

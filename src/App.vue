@@ -91,6 +91,10 @@
     watch([ from, to ], refreshAllEvents);
 
     window.ipcRenderer.on('ui@events:refresh', refreshAllEvents);
+    window.ipcRenderer.on('ui@events:show-form', (e, data) => {
+        editingEvent.value = data;
+        showEventForm.value = true;
+    });
 </script>
 
 <template>
@@ -109,7 +113,7 @@
             <div class="flex justify-between items-center gap-2">
                 <p
                     class="text-lg font-bold"
-                    v-text="!editingEvent ? 'Aggiungi un nuovo evento' : 'Modifica l\'evento'"
+                    v-text="!editingEvent?.id ? 'Aggiungi un nuovo evento' : 'Modifica l\'evento'"
                 ></p>
 
                 <button
@@ -132,7 +136,7 @@
             <div class="flex justify-between">
                 <div>
                     <button
-                        v-if="editingEvent"
+                        v-if="editingEvent?.id"
                         type="button"
                         @click="deleteEvent(editingEvent)"
                     >
@@ -143,7 +147,7 @@
                 <button
                     type="submit"
                     form="event-form"
-                    v-text="!editingEvent ? 'Aggiungi' : 'Aggiorna'"
+                    v-text="!editingEvent?.id ? 'Aggiungi' : 'Aggiorna'"
                 ></button>
             </div>
         </template>
