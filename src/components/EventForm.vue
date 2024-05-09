@@ -37,11 +37,13 @@
     }
 
     onMounted(() => {
-        props.notifyReset.onmessage = (e) => {
-            if (e.data === 'reset') {
-                form.value = {};
-            }
-        };
+        if (props.notifyReset) {
+            props.notifyReset.onmessage = (e) => {
+                if (e.data === 'reset') {
+                    form.value = {};
+                }
+            };
+        }
     });
 
     watch(
