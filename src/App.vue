@@ -89,6 +89,8 @@
     }
 
     watch([ from, to ], refreshAllEvents);
+
+    window.ipcRenderer.on('event:refresh', refreshAllEvents);
 </script>
 
 <template>
