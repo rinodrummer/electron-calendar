@@ -61,6 +61,7 @@
         initialView: props.view,
         nowIndicator: true,
         locale: itLocale,
+        height: 'auto',
         events: props.events as EventInput,
         datesSet({ start, end, view }) {
             emit('viewChanged', {
@@ -69,9 +70,9 @@
                 view: view.type as CalendarView
             });
         },
-        eventDidMount(e) {
-            e.el.addEventListener('dblclick', () => {
-                const event = e.event.toPlainObject({
+        eventDidMount(eventMount) {
+            eventMount.el.addEventListener('dblclick', () => {
+                const event = eventMount.event.toPlainObject({
                     collapseExtendedProps: true,
                     collapseColor: true,
                 });
@@ -82,7 +83,24 @@
                     start: DateTime.fromISO(event.start),
                     end: DateTime.fromISO(event.end),
                 } as CalendarEvent);
-            });
+            }, false);
+
+            eventMount.el.addEventListener('contextmenu', async (e) => {
+                const event = eventMount.event.toPlainObject({
+                    collapseExtendedProps: true,
+                    collapseColor: true,
+                });
+
+                console.log('ctx opening');
+
+                window.ipcRenderer.send('event:show-ctx-menu', {
+                    event,
+                    position: {
+                        x: e.x,
+                        y: e.y,
+                    }
+                });
+            }, false);
         },
     });
 

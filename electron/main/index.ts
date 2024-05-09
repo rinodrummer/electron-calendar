@@ -4,6 +4,7 @@ import { release } from 'node:os';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { Settings } from 'luxon';
 import initDatabase from './database.js';
+import { createEventContextMenu } from './eventContextMenu.js';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
 globalThis.__dirname = dirname(__filename);
@@ -60,7 +61,7 @@ const indexHtml = join(RENDERER_DIST, 'index.html');
 
 async function createWindow() {
     win = new BrowserWindow({
-        title: 'Main window',
+        title: 'Il tuo calendario',
         icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
         webPreferences: {
             preload,
@@ -98,15 +99,22 @@ async function createWindow() {
 }
 
 initDatabase().then(({ useEvents, closeDatabase }) => {
-    app.whenReady().then(async () => {
-        useEvents();
-        
-        await createWindow();
-    });
+    const eventsManager = useEvents();
     
     app.prependOnceListener('window-all-closed', async () => {
         await closeDatabase();
     });
+    
+    ipcMain.on('event:show-ctx-menu', (e, { event, position }) => {
+        const ctxMenu = createEventContextMenu(event, eventsManager, win);
+        
+        ctxMenu.popup({
+            window: win,
+            ...position
+        });
+    });
+    
+    app.whenReady().then(createWindow);
 });
 
 app.on('window-all-closed', () => {
