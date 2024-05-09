@@ -17,7 +17,7 @@ export function toPlaceholders(obj: object) {
             return acc;
         },
         {}
-    )
+    );
 }
 
 export default async function initDatabase() {
@@ -41,6 +41,8 @@ export default async function initDatabase() {
         ipcMain.handle('calendar:delete-events', async (e, data) => {
             return await eventsManager.deleteEvents(data);
         });
+        
+        return eventsManager;
     }
     
     return {
