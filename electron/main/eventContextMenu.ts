@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
+import { BrowserWindow, Menu, MenuItem } from 'electron';
 import { CalendarEvent } from '../../types.js';
 import { EventsManager } from './data/events.js';
 
