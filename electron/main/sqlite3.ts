@@ -3,6 +3,8 @@ import { join } from 'node:path';
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 
+// https://github.com/caoxiemeihao/electron-vite-samples/tree/main/sqlite3-main-process
+
 sqlite3.verbose();
 
 const TAG = '[sqlite3]';
