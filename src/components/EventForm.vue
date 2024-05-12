@@ -2,7 +2,7 @@
     import EventTimeInput from './EventTimeInput.vue';
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
     import { onMounted, ref, unref, watch } from 'vue';
-    import { CalendarEventInput, Upsert } from '../../types.js';
+    import { CalendarEventInput } from '../../types.js';
     import { DateTime } from 'luxon';
 
     const props = defineProps<{
@@ -11,7 +11,7 @@
     }>();
 
     const emit = defineEmits<{
-        saveEvent: [ Upsert<'events'> ]
+        saveEvent: [ CalendarEventInput ]
     }>();
 
     const form = ref<CalendarEventInput>(
@@ -19,29 +19,20 @@
     );
 
     function submitForm() {
-        const {
-            start,
-            end,
-            category,
-            categoryID,
-            allDay,
-            ...event
-        } = unref<CalendarEventInput>(form);
+        const event = unref<CalendarEventInput>(form);
 
-        emit('saveEvent', {
-            ...event as Required<Upsert<'events'>>,
-            is_all_day: Number(allDay),
-            starts_at: start?.toMillis(),
-            ends_at: end?.toMillis(),
-            category_id: categoryID,
-        });
+        emit('saveEvent', event);
+    }
+
+    function resetForm() {
+        form.value = {};
     }
 
     onMounted(() => {
         if (props.notifyReset) {
             props.notifyReset.onmessage = (e) => {
                 if (e.data === 'reset') {
-                    form.value = {};
+                    resetForm();
                 }
             };
         }
@@ -79,9 +70,9 @@
             </label>
         </div>
 
-        <div class="flex gap-2 items-center" :class="{ 'justify-between': !form.allDay }">
-            <div class="form-control flex gap-4 items-center">
-                <p>Dal</p>
+        <div class="flex gap-4 items-center flex-wrap" :class="!form.allDay ? 'md:justify-between' : 'justify-start'">
+            <div class="form-control flex gap-4 items-center w-full md:w-auto">
+                <p class="w-5">Dal</p>
 
                 <EventTimeInput v-model="form.start" :hide-time="form.allDay">
                     <template #date>
@@ -94,7 +85,7 @@
                     <template #time>
                         <EventTimeInputAttrs
                             aria-label="Ora di inizio dell'evento"
-                            :min="form.end?.minus({ minute: 5 })
+                            :max="form.end?.minus({ minute: 5 })
                                 .setZone('utc', { keepLocalTime: true })
                                 .toLocaleString(DateTime.TIME_24_SIMPLE)"
                         />
@@ -102,10 +93,13 @@
                 </EventTimeInput>
             </div>
 
-            &ndash;
+            <span
+                class="w-full hidden lg:w-auto lg:inline-block"
+                aria-hidden="true"
+            >&ndash;</span>
 
-            <div class="form-control flex gap-4 items-center">
-                <p>Al</p>
+            <div class="form-control flex gap-4 items-center w-full md:w-auto">
+                <p class="w-5">Al</p>
 
                 <EventTimeInput v-model="form.end" :hide-time="form.allDay">
                     <template #date>

@@ -11,7 +11,7 @@
         footer: any,
     }>();
 
-    const dialog = ref<HTMLDialogElement|null>(null);
+    const dialog = ref<HTMLDialogElement | null>(null);
 
     watch(open, (open) => open ?
         dialog.value?.showModal() :

@@ -6,7 +6,7 @@
         hideTime?: boolean,
     }
 
-    const props = withDefaults(defineProps<Props>(), {
+    withDefaults(defineProps<Props>(), {
         hideTime: false,
     });
 
@@ -15,7 +15,7 @@
         time: [],
     }>();
 
-    const model = defineModel<DateTime | null>();
+    const model = defineModel<DateTime | Date | null>();
 
     const date = ref<string | null>();
     const time = ref<string | null>();
@@ -34,6 +34,10 @@
     });
 
     watch(model, function (model) {
+        if (!(model instanceof DateTime)) {
+            model = DateTime.fromJSDate(model);
+        }
+
         model = model?.setZone('UTC', { keepLocalTime: true });
 
         date.value = model?.toISODate();
