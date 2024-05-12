@@ -1,4 +1,4 @@
-import { EventApi } from '@fullcalendar/core';
+import { EventInput } from '@fullcalendar/core';
 import { DateTime } from 'luxon';
 
 export type CalendarView = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay' | 'list';
@@ -30,16 +30,18 @@ export type Table<K extends keyof Tables> = Tables[K];
 export type Insert<K extends keyof Tables> = Omit<Tables[K], 'id'>;
 export type Upsert<K extends keyof Tables> = Insert<K> & { id?: Table<K>['id'] };
 
-export interface CalendarEvent extends Pick<EventApi, 'title' | 'allDay'> {
+export interface CalendarEvent extends Pick<EventInput, 'title' | 'allDay'> {
     id: number,
     description?: string,
-    start: DateTime | EventApi['start'],
-    end: DateTime | EventApi['end'],
+    start: DateTime | EventInput['start'],
+    end: DateTime | EventInput['end'],
     categoryID?: Tables['categories']['id'],
     category?: Tables['categories'],
 }
 
-export interface CalendarEventInput extends Partial<CalendarEvent> {
+interface ICalendarEventInput extends Partial<CalendarEvent> {
     start?: DateTime,
     end?: DateTime,
 }
+
+export type CalendarEventInput = EventInput | ICalendarEventInput;
