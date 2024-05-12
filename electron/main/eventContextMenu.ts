@@ -19,6 +19,19 @@ export function createEventContextMenu(event: CalendarEvent, eventsManager: Even
         async click() {
             const { id, ...eventData } = event;
             
+            const copyIndicator = eventData.title.match(/ \(([0-9]*)\)$/);
+            
+            if (copyIndicator && copyIndicator[1]) {
+                let copyNumber = Number(copyIndicator[1]);
+                
+                const title = eventData.title.substring(
+                    0,
+                    event.title.length - copyIndicator[0].length
+                );
+                
+                eventData.title = `${title} (${++copyNumber})`;
+            }
+            
             win.webContents.send('ui@events:show-form', eventData);
         }
     }));

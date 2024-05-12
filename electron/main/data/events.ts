@@ -5,9 +5,10 @@ import { toPlaceholders } from '../database.js';
 type EventIdentifier = Table<'events'> | Table<'events'>['id'];
 
 export interface EventsManager {
+    getEvent(id: Table<'events'>['id']): Promise<Table<'events'>>,
     getAllEvents(from: number, to: number): Promise<Table<'events'>[]>,
-    createEvent(event: Insert<'events'>): Promise<void>,
-    updateEvent(event: Table<'events'>): Promise<void>,
+    createEvent(event: Insert<'events'>): Promise<Table<'events'>>,
+    updateEvent(event: Table<'events'>): Promise<Table<'events'>>,
     deleteEvents(events: EventIdentifier|EventIdentifier[]): Promise<void>,
 }
 
@@ -28,18 +29,32 @@ export function initEvents(db: Database): EventsManager {
         return results;
     }
     
-    async function createEvent(event: Insert<'events'>): Promise<void> {
+    async function getEvent(id: Table<'events'>['id']): Promise<Table<'events'>> {
         const stmt = await db.prepare(
-            `INSERT INTO events(title, description, starts_at, ends_at, is_all_day, category_id)
-                VALUES ($title, $description, $starts_at, $ends_at, $is_all_day, $category_id)`
+            `SELECT * FROM events WHERE id = ?`
         );
         
-        await stmt.run(toPlaceholders(event));
+        const results = await stmt.get<Table<'events'>>(id);
         
         await stmt.finalize();
+        
+        return results;
     }
     
-    async function updateEvent(event: Table<'events'>): Promise<void> {
+    async function createEvent(event: Insert<'events'>): Promise<Table<'events'>> {
+        const stmt = await db.prepare(
+            `INSERT INTO events(title, description, starts_at, ends_at, is_all_day, category_id)
+             VALUES ($title, $description, $starts_at, $ends_at, $is_all_day, $category_id)`
+        );
+        
+        const result = await stmt.run(toPlaceholders(event));
+        
+        await stmt.finalize();
+        
+        return await getEvent(result.lastID);
+    }
+    
+    async function updateEvent(event: Table<'events'>): Promise<Table<'events'>> {
         const stmt = await db.prepare(
             `UPDATE events SET
                     title = $title,
@@ -51,9 +66,11 @@ export function initEvents(db: Database): EventsManager {
                 WHERE id = $id`
         );
         
-        await stmt.run(toPlaceholders(event));
+        const res = await stmt.run(toPlaceholders(event));
         
         await stmt.finalize();
+        
+        return await getEvent(res.lastID);
     }
     
     async function deleteEvents(events: EventIdentifier|EventIdentifier[]): Promise<void> {
@@ -79,6 +96,7 @@ export function initEvents(db: Database): EventsManager {
     }
     
     return {
+        getEvent,
         getAllEvents,
         createEvent,
         updateEvent,
