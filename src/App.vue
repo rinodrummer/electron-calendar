@@ -1,87 +1,41 @@
 <script setup lang="ts">
-    import { EventInput } from '@fullcalendar/core';
     import { DateTime } from 'luxon';
     import { ref, unref, watch } from 'vue';
     import Calendar from './components/Calendar.vue';
     import Modal from './components/Modal.vue';
     import EventForm from './components/EventForm.vue';
-    import { CalendarEvent, CalendarView, DateCompatible, Insert, Table } from '../types.js';
+    import { CalendarEventInput, CalendarView } from '../types.js';
+    import { useManageEvents } from './composables/ManageEvents.js';
 
-    const events = ref<(CalendarEvent | EventInput)[]>([]);
-
-    const editingEvent = ref<CalendarEvent | EventInput | null>();
+    const editingEvent = ref<CalendarEventInput | null>();
 
     const from = ref<DateTime | null>();
     const to = ref<DateTime | null>();
 
     const showEventForm = ref<boolean>(false);
 
-    const notifyEventForm = new MessageChannel();
-
-    function getDateTime(date: DateCompatible): DateTime {
-        return typeof date === 'number' ?
-            DateTime.fromMillis(date) :
-            DateTime.fromSQL(date.toString());
-    }
+    const notifyEventFormChannel = new MessageChannel();
 
     async function refreshAllEvents() {
-        if (!from.value || !to.value) {
-            return;
-        }
-
-        const rawEvents: Table<'events'>[] = await window.ipcRenderer.invoke('calendar:get-all-events', {
-            from: from.value.startOf('day').toMillis(),
-            to: to.value.startOf('day').toMillis()
-        });
-
-        events.value = rawEvents.map((event) => ({
-            id: event.id,
-            title: event.title,
-            description: event.description,
-            allDay: Boolean(event.is_all_day ?? false),
-            start: getDateTime(event.starts_at).toJSDate(),
-            end: getDateTime(event.ends_at).toJSDate(),
-            editable: true,
-            startEditable: true,
-            durationEditable: true,
-        }));
+        events.value = await getEventsByPeriod(from.value, to.value);
     }
 
-    async function addEvent(event: Insert<'events'>) {
-        try {
-            await window.ipcRenderer.invoke('calendar:create-event', event);
+    async function notifyEventFormReset() {
+        showEventForm.value = false;
+        notifyEventFormChannel.port1.postMessage('reset');
 
-            showEventForm.value = false;
-            notifyEventForm.port1.postMessage('reset');
-
-            await refreshAllEvents();
-        }
-        catch (err) {}
+        await refreshAllEvents();
     }
 
-    async function updateEvent(event: Table<'events'>) {
-        try {
-            await window.ipcRenderer.invoke('calendar:update-event', event);
-
-            showEventForm.value = false;
-            notifyEventForm.port1.postMessage('reset');
-
-            await refreshAllEvents();
-        }
-        catch (err) {}
-    }
-
-    async function deleteEvent(event: CalendarEvent | EventInput) {
-        try {
-            await window.ipcRenderer.invoke('calendar:delete-events', event.id);
-
-            showEventForm.value = false;
-            notifyEventForm.port1.postMessage('reset');
-
-            await refreshAllEvents();
-        }
-        catch (err) {}
-    }
+    const {
+        events,
+        saveEvent,
+        deleteEvent,
+        getEventsByPeriod,
+    } = useManageEvents({
+        onSave: notifyEventFormReset,
+        onDelete: notifyEventFormReset,
+    });
 
     function setViewDates({ start, end }: { start: DateTime, end: DateTime, view: CalendarView }) {
         from.value = start;
@@ -91,8 +45,13 @@
     watch([ from, to ], refreshAllEvents);
 
     window.ipcRenderer.on('ui@events:refresh', refreshAllEvents);
-    window.ipcRenderer.on('ui@events:show-form', (e, data) => {
-        editingEvent.value = data;
+    window.ipcRenderer.on('ui@events:show-form', (_e, data) => {
+        editingEvent.value = {
+            ...data,
+            start: DateTime.fromJSDate(data.start),
+            end: DateTime.fromJSDate(data.end),
+        };
+
         showEventForm.value = true;
     });
 </script>
@@ -101,6 +60,7 @@
     <Calendar
         :events
         view="timeGridWeek"
+        @save-event="saveEvent"
         @view-changed="setViewDates"
         @show-event-form="(event) => {
             editingEvent = event;
@@ -108,7 +68,7 @@
         }"
     />
 
-    <Modal v-model="showEventForm" id="create-event-modal">
+    <Modal v-model="showEventForm" id="event-form-modal">
         <template #header>
             <div class="flex justify-between items-center gap-2">
                 <p
@@ -128,8 +88,8 @@
         <EventForm
             id="event-form"
             :event="unref(editingEvent)"
-            :notify-reset="notifyEventForm.port2"
-            @save-event="(calEvent) => calEvent.id ? updateEvent(calEvent as Table<'events'>) : addEvent(calEvent)"
+            :notify-reset="notifyEventFormChannel.port2"
+            @save-event="saveEvent"
         />
 
         <template #footer>
@@ -155,7 +115,19 @@
 </template>
 
 <style>
-    #create-event-modal {
-        width: 50vw;
+    #event-form-modal {
+        width: 90vw;
+    }
+
+    @media screen and (min-width: 728px) {
+        #event-form-modal {
+            width: 70vw;
+        }
+    }
+
+    @media screen and (min-width: 1024px) {
+        #event-form-modal {
+            width: 50vw;
+        }
     }
 </style>
