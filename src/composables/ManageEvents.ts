@@ -55,7 +55,7 @@ function dehydrateEvent(event: CalendarEventInput): Upsert<'events'> {
     
     return {
         ...eventData,
-        is_all_day: Number(allDay),
+        is_all_day: Number(allDay ?? false),
         starts_at: toMillis(start as DateCompatible),
         ends_at: toMillis(end as DateCompatible),
         category_id: categoryID,
@@ -66,10 +66,9 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
     const events = ref<CalendarEventInput[]>([]);
     
     async function saveEvent(event: MaybeRefOrGetter<CalendarEventInput>, revert?: () => void): Promise<boolean> {
-        const eventData = dehydrateEvent(toValue(event))
+        const eventData = dehydrateEvent(toValue(event));
         
         try {
-            
             const calEvent = await window.ipcRenderer.invoke(
                 eventData.id ? 'calendar:update-event' : 'calendar:create-event',
                 eventData
@@ -82,7 +81,7 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
             return true;
         }
         catch (err) {
-            console.log(err);
+            console.log(err, event);
             
             if (revert) {
                 revert();

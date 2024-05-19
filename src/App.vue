@@ -60,7 +60,7 @@
     <Calendar
         :events
         view="timeGridWeek"
-        @save-event="saveEvent"
+        @save-event="(event, revert) => saveEvent(event, revert)"
         @view-changed="setViewDates"
         @show-event-form="(event) => {
             editingEvent = event;

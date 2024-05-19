@@ -24,23 +24,22 @@
 
     const emit = defineEmits<{
         showEventForm: [ event?: CalendarEventInput ],
-        saveEvent: [ event?: CalendarEventInput, revert?: () => void  ],
+        saveEvent: [ event: CalendarEventInput, revert?: () => void  ],
         deleteEvent: [ event: CalendarEventInput ],
         viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
     }>();
 
     async function upsertEvent(eventName: string, { event, revert }: EventAddArg | EventReceiveArg) {
+        console.log(event, revert);
+
         emit('saveEvent', {
-            event: {
-                ...event.toPlainObject({
-                    collapseExtendedProps: true,
-                    collapseColor: true,
-                }),
-                start: DateTime.fromJSDate(event.start).toJSDate(),
-                end: DateTime.fromJSDate(event.end).toJSDate(),
-            },
-            revert
-        });
+            ...event.toPlainObject({
+                collapseExtendedProps: true,
+                collapseColor: true,
+            }),
+            start: DateTime.fromJSDate(event.start),
+            end: DateTime.fromJSDate(event.end),
+        }, revert);
     }
 
     const options = reactive<CalendarOptions>({
