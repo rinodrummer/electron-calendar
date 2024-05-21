@@ -68,7 +68,7 @@
         .modal-header,
         .modal-content,
         .modal-footer {
-            @apply py-4 px-8;
+            @apply py-4 px-8 bg-white dark:bg-gray-800 dark:text-white;
         }
 
         .modal-content {

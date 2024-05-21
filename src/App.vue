@@ -4,6 +4,9 @@
     import Calendar from './components/VCalendar.vue';
     import Modal from './components/VModal.vue';
     import EventForm from './components/EventForm.vue';
+    import VButton from '#src/components/buttons/ButtonBase.vue';
+    import VButtonDanger from '#src/components/buttons/ButtonDanger.vue';
+    import VButtonSuccess from '#src/components/buttons/ButtonSuccess.vue';
     import { CalendarEventInput, CalendarView } from '../types.js';
     import { useManageEvents } from './composables/ManageEvents.js';
 
@@ -76,12 +79,13 @@
                     v-text="!editingEvent?.id ? 'Aggiungi un nuovo evento' : 'Modifica l\'evento'"
                 ></p>
 
-                <button
+                <v-button
                     type="button"
+                    class="bg-gray-200 font-bold text-lg align-middle"
                     @click.prevent="showEventForm = false"
                 >
                     &times;
-                </button>
+                </v-button>
             </div>
         </template>
 
@@ -95,20 +99,19 @@
         <template #footer>
             <div class="flex justify-between">
                 <div>
-                    <button
+                    <v-button-danger
                         v-if="editingEvent?.id"
-                        type="button"
                         @click="deleteEvent(editingEvent)"
                     >
                         Elimina evento
-                    </button>
+                    </v-button-danger>
                 </div>
 
-                <button
+                <v-button-success
                     type="submit"
                     form="event-form"
                     v-text="!editingEvent?.id ? 'Aggiungi' : 'Aggiorna'"
-                ></button>
+                ></v-button-success>
             </div>
         </template>
     </Modal>
