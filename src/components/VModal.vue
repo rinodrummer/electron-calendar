@@ -50,11 +50,17 @@
 </template>
 
 <style scoped>
+    .modal:modal {
+        .modal[open],
+        .modal.open {
+            min-width: 320px;
+            max-width: 90vw;
+            max-height: 90dvh;
+        }
+    }
+
     .modal[open],
     .modal.open {
-        min-width: 320px;
-        max-width: 90vw;
-        max-height: 90dvh;
         border: none;
         outline: none;
         @apply flex flex-col overflow-hidden rounded-xl shadow-2xl border-0 outline-0;

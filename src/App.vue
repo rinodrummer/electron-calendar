@@ -2,7 +2,7 @@
     import { DateTime } from 'luxon';
     import { ref, unref, watch } from 'vue';
     import Calendar from './components/Calendar.vue';
-    import Modal from './components/Modal.vue';
+    import Modal from './components/VModal.vue';
     import EventForm from './components/EventForm.vue';
     import { CalendarEventInput, CalendarView } from '../types.js';
     import { useManageEvents } from './composables/ManageEvents.js';
