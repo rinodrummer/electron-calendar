@@ -30,8 +30,6 @@
     }>();
 
     async function upsertEvent(eventName: string, { event, revert }: EventAddArg | EventReceiveArg) {
-        console.log(event, revert);
-
         emit('saveEvent', {
             ...event.toPlainObject({
                 collapseExtendedProps: true,

@@ -81,8 +81,6 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
             return true;
         }
         catch (err) {
-            console.log(err, event);
-            
             if (revert) {
                 revert();
             }
