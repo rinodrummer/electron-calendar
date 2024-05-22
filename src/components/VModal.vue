@@ -1,4 +1,4 @@
-<script setup lang="ts" xmlns:slot="http://www.w3.org/1999/html">
+<script setup lang="ts">
     import { onMounted, onUnmounted, ref, watch } from 'vue';
 
     const open = defineModel<boolean>({
