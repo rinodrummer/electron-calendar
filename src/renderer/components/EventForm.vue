@@ -2,7 +2,7 @@
     import EventTimeInput from './EventTimeInput.vue';
     import EventTimeInputAttrs from './EventTimeInputAttrs.vue';
     import { onMounted, ref, unref, watch } from 'vue';
-    import { CalendarEventInput } from '../../types.js';
+    import { CalendarEvent, CalendarEventInput } from '../../types.js';
     import { DateTime } from 'luxon';
 
     const props = defineProps<{
@@ -14,7 +14,13 @@
         saveEvent: [ CalendarEventInput ]
     }>();
 
-    const form = ref<CalendarEventInput>(
+    interface ICalendarEventInput extends Partial<CalendarEvent> {
+        start?: DateTime,
+        end?: DateTime,
+    }
+
+    const form = ref<ICalendarEventInput>(
+        // @ts-ignore
         props.event ?? {}
     );
 
@@ -40,7 +46,7 @@
 
     watch(
         () => props.event,
-        () => form.value = { ...props.event }
+        () => form.value = { ...props.event } as ICalendarEventInput
     );
 </script>
 

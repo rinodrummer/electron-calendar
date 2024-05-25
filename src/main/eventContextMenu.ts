@@ -1,5 +1,5 @@
 import { BrowserWindow, Menu, MenuItem } from 'electron';
-import { CalendarEvent } from '../../types.js';
+import { CalendarEvent } from '../types.js';
 import { EventsManager } from './data/events.js';
 
 export function createEventContextMenu(event: CalendarEvent, eventsManager: EventsManager, win: BrowserWindow): Menu {

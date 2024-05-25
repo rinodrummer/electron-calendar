@@ -9,9 +9,10 @@ declare module '*.vue' {
 }
 
 declare module '@fullcalendar/core' {
+    import { DateInput as BaseDateInput } from '@fullcalendar/core';
     export * from '@fullcalendar/core';
     
-    export const DateInput = BaseDateInput | DateTime;
+    export type DateInput = BaseDateInput | DateTime;
 }
 
 declare global {

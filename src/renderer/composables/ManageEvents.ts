@@ -1,10 +1,10 @@
 import { MaybeRefOrGetter, ref, toValue } from 'vue';
 import { DateTime } from 'luxon';
-import { CalendarEventInput, DateCompatible, Table, Upsert } from '../../types.js';
+import { CalendarEvent, CalendarEventInput, DateCompatible, Table, Upsert } from '../../types.js';
 
 interface ComposableArgs {
     onSave?: (event: CalendarEventInput) => void,
-    onDelete?: (event: CalendarEventInput) => void,
+    onDelete?: (event: CalendarEvent) => void,
 }
 
 function getDateTime(date: DateCompatible): DateTime {
@@ -31,7 +31,7 @@ function toMillis(date?: DateTime | DateCompatible): number | null {
 
 function hydrateEvent(event: Table<'events'>): CalendarEventInput {
     return {
-        id: event.id?.toString(),
+        id: event.id,
         title: event.title,
         description: event.description,
         allDay: Boolean(event.is_all_day ?? false),
@@ -63,7 +63,7 @@ function dehydrateEvent(event: CalendarEventInput): Upsert<'events'> {
 }
 
 export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
-    const events = ref<CalendarEventInput[]>([]);
+    const events = ref<(CalendarEvent)[]>([]);
     
     async function saveEvent(event: MaybeRefOrGetter<CalendarEventInput>, revert?: () => void): Promise<boolean> {
         const eventData = dehydrateEvent(toValue(event));
@@ -89,8 +89,8 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
         }
     }
     
-    async function deleteEvent(event: MaybeRefOrGetter<CalendarEventInput>): Promise<boolean> {
-        event = toValue<CalendarEventInput>(event);
+    async function deleteEvent(event: MaybeRefOrGetter<CalendarEvent>): Promise<boolean> {
+        event = toValue<CalendarEvent>(event);
         
         try {
             await window.ipcRenderer.invoke('calendar:delete-events', event.id);
@@ -106,7 +106,7 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
         }
     }
     
-    async function getEventsByPeriod(from: MaybeRefOrGetter<DateTime | null>, to: MaybeRefOrGetter<DateTime | null>): Promise<CalendarEventInput[]> {
+    async function getEventsByPeriod(from: MaybeRefOrGetter<DateTime | null>, to: MaybeRefOrGetter<DateTime | null>): Promise<CalendarEvent[]> {
         const fromVal = toValue(from);
         const toVal = toValue(to);
         
@@ -119,7 +119,7 @@ export function useManageEvents({ onSave, onDelete }: ComposableArgs) {
             to: toVal.startOf('day').toMillis()
         });
         
-        return rawEvents.map(hydrateEvent) as CalendarEventInput[];
+        return rawEvents.map(hydrateEvent) as CalendarEvent[];
     }
     
     return {

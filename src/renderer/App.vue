@@ -4,10 +4,10 @@
     import Calendar from './components/VCalendar.vue';
     import Modal from './components/VModal.vue';
     import EventForm from './components/EventForm.vue';
-    import VButton from '#src/components/buttons/ButtonBase.vue';
-    import VButtonDanger from '#src/components/buttons/ButtonDanger.vue';
-    import VButtonSuccess from '#src/components/buttons/ButtonSuccess.vue';
-    import { CalendarEventInput, CalendarView } from '../types.js';
+    import VButton from './components/buttons/ButtonBase.vue';
+    import VButtonDanger from './components/buttons/ButtonDanger.vue';
+    import VButtonSuccess from './components/buttons/ButtonSuccess.vue';
+    import { CalendarEvent, CalendarEventInput, CalendarView } from '../types.js';
     import { useManageEvents } from './composables/ManageEvents.js';
 
     const editingEvent = ref<CalendarEventInput | null>();
@@ -101,7 +101,7 @@
                 <div>
                     <v-button-danger
                         v-if="editingEvent?.id"
-                        @click="deleteEvent(editingEvent)"
+                        @click="deleteEvent(editingEvent as CalendarEvent)"
                     >
                         Elimina evento
                     </v-button-danger>

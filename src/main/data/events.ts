@@ -1,5 +1,5 @@
 import { type Database } from 'sqlite';
-import { Insert, Table } from '../../../types.js';
+import { Insert, Table } from '../../types.js';
 import { toPlaceholders } from '../database.js';
 
 type EventIdentifier = Table<'events'> | Table<'events'>['id'];
@@ -78,7 +78,7 @@ export function initEvents(db: Database): EventsManager {
             events = [ events ];
         }
         
-        events = events.map((event) => {
+        events = events.map((event: EventIdentifier) => {
             if (typeof event === 'object') {
                 return event.id;
             }

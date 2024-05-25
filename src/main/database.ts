@@ -7,7 +7,7 @@ let db: Database = null;
 
 export function toPlaceholders(obj: object) {
     return Object.entries(obj).reduce(
-        (acc, [ key, val ]) => {
+        (acc: Record<string, unknown>, [ key, val ]) => {
             if (!key.startsWith('$')) {
                 key = '$' + key;
             }

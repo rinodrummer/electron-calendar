@@ -29,7 +29,8 @@
   "imports": {
     "#root/*": "./*",
     "#src/*": "./src/*",
-    "#electron/*": "./electron/*"
+    "#electron/*": "./src/electron/*",
+    "#renderer/*": "./src/renderer/*"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",

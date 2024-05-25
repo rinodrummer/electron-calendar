@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import ButtonBase from '#src/components/buttons/ButtonBase.vue';
+    import ButtonBase from './ButtonBase.vue';
 </script>
 
 <template>
