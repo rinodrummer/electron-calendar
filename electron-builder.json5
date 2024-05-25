@@ -3,7 +3,7 @@
  */
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "rd-calendar",
+  "appId": "dev.rinodrummer.calendar",
   "asar": false,
   "executableName": "Calendar",
   "productName": "Calendario Appuntamenti",
