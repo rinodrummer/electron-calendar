@@ -16,6 +16,10 @@
     "dist-electron",
     "migrations"
   ],
+  "publish": {
+    provider: "github",
+    "owner": "rinodrummer",
+  },
   "nsis": {
     "oneClick": false,
     "perMachine": false,
