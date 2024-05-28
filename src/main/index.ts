@@ -6,8 +6,8 @@ import { Settings } from 'luxon';
 import initDatabase from './database.js';
 import { createEventContextMenu } from './eventContextMenu.js';
 
-globalThis.__filename = fileURLToPath(import.meta.url);
-globalThis.__dirname = dirname(__filename);
+const __filename = globalThis.__filename = fileURLToPath(import.meta.url);
+const __dirname = globalThis.__dirname = dirname(__filename);
 
 // The built directory structure
 //
@@ -114,8 +114,10 @@ initDatabase().then(({ useEvents, closeDatabase }) => {
         });
     });
     
-    app.whenReady().then(createWindow);
-});
+    app.whenReady()
+        .then(createWindow)
+        .catch(err => console.error(err));
+}).catch(err => console.error(err));
 
 app.on('window-all-closed', () => {
     win = null;

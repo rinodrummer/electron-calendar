@@ -21,7 +21,12 @@ export function toPlaceholders(obj: object) {
 }
 
 export default async function initDatabase() {
-    db = await getSqlite3();
+    try {
+        db = await getSqlite3();
+    }
+    catch (err) {
+        throw err;
+    }
     
     function useEvents() {
         const eventsManager = initEvents(db);

@@ -115,7 +115,9 @@ function useLoading() {
 // ----------------------------------------------------------------------
 
 const { appendLoading, removeLoading } = useLoading();
-domReady().then(appendLoading);
+domReady()
+    .then(appendLoading)
+    .catch(err => console.log(err));
 
 window.onmessage = (ev) => {
     ev.data.payload === 'removeLoading' && removeLoading();

@@ -42,8 +42,13 @@ export function createEventContextMenu(event: CalendarEvent, eventsManager: Even
         label: 'Elimina',
         accelerator: 'e',
         async click() {
-            await eventsManager.deleteEvents(event.id);
-            win.webContents.send('ui@events:refresh');
+            try {
+                await eventsManager.deleteEvents(event.id);
+                win.webContents.send('ui@events:refresh');
+            }
+            catch (err) {
+                console.log(err);
+            }
         }
     }));
     
