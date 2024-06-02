@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "esnext",
     "module": "NodeNext",
-    "useDefineForClassFields": true,
     "moduleResolution": "NodeNext",
+    "useDefineForClassFields": true,
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
@@ -16,7 +16,7 @@
     "allowJs": true,
     "baseUrl": "."
   },
-  "include": ["src", "types.ts"],
+  "include": ["src"],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]

@@ -5,6 +5,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { Settings } from 'luxon';
 import initDatabase from './database.js';
 import { createEventContextMenu } from './eventContextMenu.js';
+import electronUpdater from 'electron-updater';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
 globalThis.__dirname = dirname(__filename);
@@ -56,13 +57,15 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null;
-const preload = join(__dirname, '../preload/index.mjs');
+const preload = join(globalThis.__dirname, '../preload/index.mjs');
 const indexHtml = join(RENDERER_DIST, 'index.html');
 
 async function createWindow() {
     win = new BrowserWindow({
         title: 'Il tuo calendario',
         icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+        minWidth: 670,
+        minHeight: 400,
         webPreferences: {
             preload,
             // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -114,8 +117,17 @@ initDatabase().then(({ useEvents, closeDatabase }) => {
         });
     });
     
-    app.whenReady().then(createWindow);
-});
+    app.whenReady()
+        .then(() => {
+            electronUpdater.autoUpdater.checkForUpdatesAndNotify({
+                title: 'Nuovo aggiornamento disponibile!',
+                body: 'Un nuovo aggiornamento è pronto per essere installato.'
+            });
+            
+            createWindow();
+        })
+        .catch(err => console.error(err));
+}).catch(err => console.error(err));
 
 app.on('window-all-closed', () => {
     win = null;

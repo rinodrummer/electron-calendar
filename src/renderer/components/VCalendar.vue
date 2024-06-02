@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { Calendar, type CalendarOptions, EventAddArg, EventDropArg, EventInput } from '@fullcalendar/core';
+    import { Calendar, type CalendarOptions, EventAddArg, EventApi, EventDropArg, EventInput } from '@fullcalendar/core';
     import interactionPlugin, { EventReceiveArg, EventResizeDoneArg } from '@fullcalendar/interaction';
     import FullCalendar from '@fullcalendar/vue3';
     import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,10 +9,11 @@
     import itLocale from '@fullcalendar/core/locales/it';
     import { reactive, ref, watch } from 'vue';
     import { DateTime } from 'luxon';
-    import { CalendarEventInput, CalendarView } from '../../types.js';
+    import { CalendarEvent, CalendarEventInput, CalendarView } from '../../types.js';
+    import { Dictionary } from '@fullcalendar/core/internal';
 
     interface Props {
-        events?: (CalendarEventInput)[],
+        events?: (CalendarEvent)[],
         view: CalendarView
     }
 
@@ -25,7 +26,7 @@
     const emit = defineEmits<{
         showEventForm: [ event?: CalendarEventInput ],
         saveEvent: [ event: CalendarEventInput, revert?: () => void  ],
-        deleteEvent: [ event: CalendarEventInput ],
+        deleteEvent: [ event: CalendarEvent ],
         viewChanged: [ viewInfo: { start: DateTime, end: DateTime, view: CalendarView } ],
     }>();
 
@@ -86,7 +87,7 @@
             });
         },
         eventDidMount(eventMount) {
-            const event = eventMount.event.toPlainObject({
+            const event: Record<string, any> = eventMount.event.toPlainObject({
                 collapseExtendedProps: true,
                 collapseColor: true,
             });
@@ -117,7 +118,7 @@
     });
 
     watch(() => props.events, (events) => {
-        options.events = events as EventInput[];
+        options.events = events as {}[];
 
         fullCalendar.value?.getApi().refetchEvents();
     });
