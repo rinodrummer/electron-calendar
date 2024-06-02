@@ -24,7 +24,7 @@ It's based on [electron-vite/electron-vite-vue][template] and uses:
 - [SQLite] via [sqlite][node-sqlite] and [sqlite3-offline-next][node-sqlite3]
 - [Tailwind CSS][Tailwind] with `forms` and `typography` plugins
 
-<a href="https://it.freepik.com/icona/tempo_15429140#fromView=resource_detail&position=23">Icon by Laura Reen</a>.
+[Icon by Laura Reen][icon].
 
 [template]: https://github.com/electron-vite/electron-vite-vue
 [TypeScript]: https://www.typescriptlang.org/
@@ -37,3 +37,4 @@ It's based on [electron-vite/electron-vite-vue][template] and uses:
 [node-sqlite]: https://www.npmjs.com/package/sqlite
 [node-sqlite3]: https://github.com/nicolaiort/sqlite3-offline-next
 [Tailwind]: https://tailwindcss.com/
+[icon]: https://it.freepik.com/icona/tempo_15429140#fromView=resource_detail&position=23
