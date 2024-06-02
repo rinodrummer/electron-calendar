@@ -6,8 +6,8 @@ import { Settings } from 'luxon';
 import initDatabase from './database.js';
 import { createEventContextMenu } from './eventContextMenu.js';
 
-const __filename = globalThis.__filename = fileURLToPath(import.meta.url);
-const __dirname = globalThis.__dirname = dirname(__filename);
+globalThis.__filename = fileURLToPath(import.meta.url);
+globalThis.__dirname = dirname(__filename);
 
 // The built directory structure
 //
@@ -56,7 +56,7 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null;
-const preload = join(__dirname, '../preload/index.mjs');
+const preload = join(globalThis.__dirname, '../preload/index.mjs');
 const indexHtml = join(RENDERER_DIST, 'index.html');
 
 async function createWindow() {

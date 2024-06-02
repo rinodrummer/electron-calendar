@@ -78,7 +78,7 @@ export default defineConfig(({ command }) => {
         clearScreen: false,
         build: {
             rollupOptions: {
-                external: [ 'sqlite' ]
+                external: [ 'sqlite', 'sqlite3' ]
             }
         }
     };
