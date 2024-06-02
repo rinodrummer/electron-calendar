@@ -1,5 +1,5 @@
 {
-  "name": "calendar",
+  "name": "dev.rinodrummer.calendar",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "Simple calendar app to reserve and manage appointments",
