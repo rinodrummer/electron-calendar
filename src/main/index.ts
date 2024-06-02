@@ -5,6 +5,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { Settings } from 'luxon';
 import initDatabase from './database.js';
 import { createEventContextMenu } from './eventContextMenu.js';
+import electronUpdater from 'electron-updater';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
 globalThis.__dirname = dirname(__filename);
@@ -117,7 +118,14 @@ initDatabase().then(({ useEvents, closeDatabase }) => {
     });
     
     app.whenReady()
-        .then(createWindow)
+        .then(() => {
+            electronUpdater.autoUpdater.checkForUpdatesAndNotify({
+                title: 'Nuovo aggiornamento disponibile!',
+                body: 'Un nuovo aggiornamento è pronto per essere installato.'
+            });
+            
+            createWindow();
+        })
         .catch(err => console.error(err));
 }).catch(err => console.error(err));
 
