@@ -1,8 +1,7 @@
 # Calendar
 
-**🚧 This application is under active development! 🚧**
-
-**Latest changes are available under the [`develop` branch](https://github.com/rinodrummer/electron-calendar/tree/develop)**
+## 🚧 This application is under active development! 🚧
+## Latest changes are available under the [`develop` branch](https://github.com/rinodrummer/electron-calendar/tree/develop)
 
 This application is a stand-alone calendar, made for a friend.
 
@@ -13,13 +12,13 @@ It's based on [electron-vite/electron-vite-vue][template] and uses:
 - [Vue] 3
 - [TypeScript]
 - [FullCalendar] 6
-    - `@fullcalendar/core`
-    - `@fullcalendar/daygrid`
-    - `@fullcalendar/interaction`
-    - `@fullcalendar/list`
-    - `@fullcalendar/luxon3`
-    - `@fullcalendar/timegrid`
-    - `@fullcalendar/vue3`
+  - `@fullcalendar/core`
+  - `@fullcalendar/daygrid`
+  - `@fullcalendar/interaction`
+  - `@fullcalendar/list`
+  - `@fullcalendar/luxon3`
+  - `@fullcalendar/timegrid`
+  - `@fullcalendar/vue3`
 - [Luxon]
 - [SQLite] via [sqlite][node-sqlite] and [sqlite3-offline-next][node-sqlite3]
 - [Tailwind CSS][Tailwind] with `forms` and `typography` plugins
