@@ -21,7 +21,7 @@ It's based on [electron-vite/electron-vite-vue][template] and uses:
     - `@fullcalendar/timegrid`
     - `@fullcalendar/vue3`
 - [Luxon]
-- [SQLite] via [sqlite][node-sqlite] and [sqlite3][node-sqlite3]
+- [SQLite] via [sqlite][node-sqlite] and [sqlite3-offline-next][node-sqlite3]
 - [Tailwind CSS][Tailwind] with `forms` and `typography` plugins
 
 <a href="https://it.freepik.com/icona/tempo_15429140#fromView=resource_detail&position=23">Icon by Laura Reen</a>.
@@ -35,5 +35,5 @@ It's based on [electron-vite/electron-vite-vue][template] and uses:
 [Luxon]: https://moment.github.io/luxon/
 [SQLite]: https://www.sqlite.org/
 [node-sqlite]: https://www.npmjs.com/package/sqlite
-[node-sqlite3]: https://www.npmjs.com/package/sqlite3
+[node-sqlite3]: https://github.com/nicolaiort/sqlite3-offline-next
 [Tailwind]: https://tailwindcss.com/
