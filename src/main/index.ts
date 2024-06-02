@@ -63,6 +63,8 @@ async function createWindow() {
     win = new BrowserWindow({
         title: 'Il tuo calendario',
         icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+        minWidth: 670,
+        minHeight: 400,
         webPreferences: {
             preload,
             // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
