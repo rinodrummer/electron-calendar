@@ -1,14 +1,22 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { release } from 'node:os';
+import * as process from 'node:process';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import electronUpdater from 'electron-updater';
+import * as log from 'electron-log/main.js';
 import { Settings } from 'luxon';
 import initDatabase from './database.js';
 import { createEventContextMenu } from './eventContextMenu.js';
-import electronUpdater from 'electron-updater';
 
 globalThis.__filename = fileURLToPath(import.meta.url);
 globalThis.__dirname = dirname(__filename);
+
+if (app.isPackaged) {
+    log.initialize();
+    log.errorHandler.startCatching();
+    log.eventLogger.startLogging();
+}
 
 // The built directory structure
 //
@@ -78,12 +86,12 @@ async function createWindow() {
     });
     
     if (VITE_DEV_SERVER_URL) { // #298
-        win.loadURL(VITE_DEV_SERVER_URL);
+        await win.loadURL(VITE_DEV_SERVER_URL);
         // Open devTool if the app is not packaged
         win.webContents.openDevTools();
     }
     else {
-        win.loadFile(indexHtml);
+        await win.loadFile(indexHtml);
     }
     
     // Test actively push a message to the Electron-Renderer
@@ -118,19 +126,13 @@ initDatabase().then(({ useEvents, closeDatabase }) => {
     });
     
     app.whenReady()
-        .then(() => {
-            electronUpdater.autoUpdater.checkForUpdatesAndNotify({
-                title: 'Nuovo aggiornamento disponibile!',
-                body: 'Un nuovo aggiornamento è pronto per essere installato.'
-            });
-            
-            createWindow();
-        })
+        .then(createWindow)
         .catch(err => console.error(err));
 }).catch(err => console.error(err));
 
 app.on('window-all-closed', () => {
     win = null;
+    
     if (process.platform !== 'darwin') {
         app.quit();
     }
@@ -146,30 +148,36 @@ app.on('second-instance', () => {
     }
 });
 
-app.on('activate', () => {
+app.on('activate', async () => {
     const allWindows = BrowserWindow.getAllWindows();
+    
     if (allWindows.length) {
         allWindows[0].focus();
     }
     else {
-        createWindow();
+        await createWindow();
     }
+    
+    await electronUpdater.autoUpdater.checkForUpdatesAndNotify({
+        title: 'Nuovo aggiornamento disponibile!',
+        body: 'Un nuovo aggiornamento è pronto per essere installato.'
+    });
 });
 
 // New window example arg: new windows url
-ipcMain.handle('open-win', (_, arg) => {
+ipcMain.handle('open-win', async (_, arg) => {
     const childWindow = new BrowserWindow({
         webPreferences: {
             preload,
-            nodeIntegration: true,
-            contextIsolation: false,
+            nodeIntegration: false,
+            contextIsolation: true,
         },
     });
     
     if (VITE_DEV_SERVER_URL) {
-        childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
+        await childWindow.loadURL(`${VITE_DEV_SERVER_URL}#${arg}`);
     }
     else {
-        childWindow.loadFile(indexHtml, { hash: arg })
+        await childWindow.loadFile(indexHtml, { hash: arg });
     }
 });
